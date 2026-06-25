@@ -93,6 +93,7 @@ function viewWord(s){
         '</div>'+
         '<div class="section-title" style="font-size:16px">📖 Nghĩa</div>'+
         defs+
+        '<div class="cz-img-wrap" id="wordImg"></div>'+
       '</div>'+
     '</div>'+
 
@@ -118,6 +119,7 @@ function viewWord(s){
   '</div></div>';
 
   initWriter(writerChars[0]);
+  if(CZ.wordImage) CZ.wordImage(document.getElementById('wordImg'), w.s, w);
 }
 function initWriter(ch){
   if(!ch||typeof HanziWriter==='undefined') return;
@@ -156,7 +158,7 @@ function viewLearn(){
     '<div class="card pad-lg" style="margin-top:22px">'+
       '<div class="section-title" style="font-size:17px">📈 Học theo cấp độ</div>'+
       '<div class="seg" style="margin-bottom:8px">'+
-        seg('hsk:1','HSK 1')+seg('hsk:2','HSK 2')+seg('hsk:3','HSK 3')+seg('all','Tất cả')+
+        seg('hsk:1','HSK 1')+seg('hsk:2','HSK 2')+seg('hsk:3','HSK 3')+seg('hsk:4','HSK 4')+seg('hsk:5','HSK 5')+seg('hsk:6','HSK 6')+seg('all','Tất cả')+
       '</div>'+
       '<div class="section-title" style="font-size:17px;margin-top:18px">🗂️ Học theo chủ đề</div>'+
       '<div class="chips">'+topicChips+'</div>'+
@@ -179,7 +181,7 @@ function viewBrowse(arg){
 }
 function renderBrowse(){
   var list=poolBy(browseSel);
-  var levels=[['hsk:1','HSK 1'],['hsk:2','HSK 2'],['hsk:3','HSK 3'],['all','Tất cả'],['notebook','★ Sổ tay']];
+  var levels=[['hsk:1','HSK 1'],['hsk:2','HSK 2'],['hsk:3','HSK 3'],['hsk:4','HSK 4'],['hsk:5','HSK 5'],['hsk:6','HSK 6'],['all','Tất cả'],['notebook','★ Sổ tay']];
   var segHtml=levels.map(function(l){
     return '<button class="'+(browseSel===l[0]?'active':'')+'" onclick="CZ.browseSet(\''+l[0]+'\')">'+l[1]+'</button>';
   }).join('');
@@ -244,7 +246,7 @@ function srcLabel(sel){
   if(sel.indexOf('topic:')===0) return sel.slice(6); return sel;
 }
 function sourcePicker(route){
-  var opts=[['hsk:1','HSK 1'],['hsk:2','HSK 2'],['hsk:3','HSK 3'],['all','Tất cả'],['notebook','★ Sổ tay']];
+  var opts=[['hsk:1','HSK 1'],['hsk:2','HSK 2'],['hsk:3','HSK 3'],['hsk:4','HSK 4'],['hsk:5','HSK 5'],['hsk:6','HSK 6'],['all','Tất cả'],['notebook','★ Sổ tay']];
   return '<div class="card pad-lg" style="max-width:560px;margin:0 auto;text-align:center">'+
     '<div style="font-size:46px">'+(route==='flashcard'?'🎴':route==='quiz'?'🧠':'📝')+'</div>'+
     '<div class="section-title" style="justify-content:center">Chọn bộ từ để bắt đầu</div>'+
@@ -284,6 +286,7 @@ function renderFlash(){
         '<div class="py">'+esc(w.p)+'</div>'+
         '<div class="hv">⎈ '+esc(w.hv)+'</div>'+
         '<div class="mn">'+esc(w.m)+'</div>'+exHtml+
+        '<div id="fcImg"></div>'+
       '</div>'+
     '</div></div>'+
     '<div class="flash-actions">'+
@@ -292,6 +295,7 @@ function renderFlash(){
     '</div>'+
     '<div style="margin-top:10px;color:var(--muted);font-size:13px"><span class="kbd">Space</span> lật · <span class="kbd">→</span> đã thuộc</div>'+
   '</div></div>';
+  if(CZ.wordImage) CZ.wordImage(document.getElementById('fcImg'), w.s, w, true);
 }
 function flashDone(){
   var xp=fc.known*5; addXp(xp);
@@ -422,7 +426,7 @@ function viewTest(arg){
       '<div style="font-size:46px">📝</div>'+
       '<p style="font-weight:700;color:var(--muted)">Đề gồm câu hỏi trắc nghiệm (nghĩa · pinyin · chữ Hán), có hẹn giờ. Đạt khi đúng ≥ 60%.</p>'+
       '<div class="seg" style="justify-content:center;flex-wrap:wrap">'+
-        [['hsk:1','HSK 1'],['hsk:2','HSK 2'],['hsk:3','HSK 3']].map(function(o){return '<button onclick="CZ.go(\'test/'+o[0]+'\')">'+o[1]+'</button>';}).join('')+
+        [['hsk:1','HSK 1'],['hsk:2','HSK 2'],['hsk:3','HSK 3'],['hsk:4','HSK 4'],['hsk:5','HSK 5'],['hsk:6','HSK 6']].map(function(o){return '<button onclick="CZ.go(\'test/'+o[0]+'\')">'+o[1]+'</button>';}).join('')+
       '</div></div></div>';
     return;
   }
