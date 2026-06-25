@@ -188,9 +188,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 #writer-target{width:230px;height:230px;background:
    linear-gradient(#f2ecff,#f2ecff) center/100% 1px no-repeat,
    linear-gradient(#f2ecff,#f2ecff) center/1px 100% no-repeat,
-   #fff;border:2px dashed var(--violet-300);border-radius:18px;position:relative}
+   #fff;border:2px dashed var(--violet-300);border-radius:18px;position:relative;
+   touch-action:none;-ms-touch-action:none;cursor:crosshair}
+#writer-target svg{touch-action:none;display:block}
 #writer-target::before,#writer-target::after{content:"";position:absolute;inset:0;margin:auto;
-  background:repeating-linear-gradient(45deg,transparent,transparent 0)}
+  background:repeating-linear-gradient(45deg,transparent,transparent 0);pointer-events:none}
 .writer-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px}
 .char-tabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:6px}
 .char-tab{width:40px;height:40px;border-radius:11px;border:2px solid var(--line);font-size:22px;
