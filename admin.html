@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chineseizi · Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--violet:#7c3aed;--violet-700:#6d28d9;--magenta:#d946ef;--ink:#1e1b2e;--muted:#6b6780;--line:#ece8f7;--bg:#f6f3ff;--grad:linear-gradient(135deg,#7c3aed,#a21caf 55%,#ec4899);--shadow:0 10px 30px -12px rgba(124,58,237,.3)}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Nunito',system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  background-image:radial-gradient(1200px 500px at 10% -10%,#f3e8ff 0,transparent 60%),radial-gradient(900px 500px at 100% 0,#ffe4f3 0,transparent 55%);background-attachment:fixed}
+.hdr{background:rgba(255,255,255,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:9}
+.hdr-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:14px 20px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px}
+.logo .m{width:38px;height:38px;border-radius:11px;background:var(--grad);display:grid;place-items:center;color:#fff;font-size:20px;transform:rotate(-6deg)}
+.logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{font-size:11px;font-weight:900;color:#fff;background:var(--magenta);padding:2px 8px;border-radius:6px;text-transform:uppercase}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 70px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;font-family:inherit;font-weight:800;padding:11px 20px;border-radius:13px;transition:.16s}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:var(--shadow)}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-ghost{background:#f3eaff;color:var(--violet-700)}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;text-align:center;box-shadow:var(--shadow)}
+.stat .n{font-size:30px;font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat .l{font-size:13px;color:var(--muted);font-weight:800;margin-top:2px}
+h2{font-size:19px;margin:24px 0 12px}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:var(--shadow);font-size:14px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line)}
+th{background:#faf7ff;font-weight:800;color:var(--violet-700);position:sticky;top:0}
+tr:hover td{background:#fbf9ff}
+.avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px}
+.pill{display:inline-block;font-weight:800;font-size:12px;padding:2px 9px;border-radius:999px;background:#f3eaff;color:var(--violet-700)}
+.center{text-align:center;padding:60px 20px;color:var(--muted)}
+.center .big{font-size:54px;margin-bottom:10px}
+.bars{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:8px}
+.bars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.bars .fill{width:100%;max-width:34px;background:var(--grad);border-radius:6px 6px 0 0;min-height:3px}
+.bars .lab{font-size:10px;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+.tbl-wrap{overflow:auto;max-height:520px;border-radius:14px}
+@media(max-width:760px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header class="hdr"><div class="hdr-in">
+  <a href="./" class="logo"><span class="m">字</span> <span>Chinese<b>izi</b></span></a>
+  <span class="tag">Admin</span>
+  <div style="margin-left:auto" id="authArea"></div>
+</div></header>
+
+<main class="wrap"><div id="app">
+  <div class="center"><div class="big">⏳</div>Đang khởi tạo…</div>
+</div></main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+var FIREBASE_CONFIG={apiKey:"AIzaSyCoKAaeDIucAW19_79uP_PLH8OmvQAl9I8",authDomain:"maths-grade45.firebaseapp.com",databaseURL:"https://maths-grade45-default-rtdb.firebaseio.com",projectId:"maths-grade45",storageBucket:"maths-grade45.firebasestorage.app",messagingSenderId:"189762022645",appId:"1:189762022645:web:039b295943062a5fdb69bc"};
+var ADMINS=["nguyenleader2002@gmail.com"];   // các email được xem admin
+var app=document.getElementById('app'), authArea=document.getElementById('authArea');
+var auth,db;
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function fdate(ts){ if(!ts) return '—'; try{return new Date(ts).toLocaleString('vi-VN');}catch(e){return '—';} }
+function daysStudied(d){ d=d||{}; return Object.keys(d).filter(function(k){return d[k]>0;}).length; }
+
+try{
+  firebase.initializeApp(FIREBASE_CONFIG); auth=firebase.auth(); db=firebase.database();
+  auth.onAuthStateChanged(onAuth);
+}catch(e){ app.innerHTML='<div class="center"><div class="big">⚠️</div>Lỗi khởi tạo Firebase.</div>'; }
+
+function renderAuth(u){
+  if(u){ authArea.innerHTML='<button class="btn btn-ghost" onclick="LOGOUT()">Đăng xuất ('+esc(u.email)+')</button>'; }
+  else { authArea.innerHTML='<button class="btn btn-primary" onclick="LOGIN()">Đăng nhập Google</button>'; }
+}
+window.LOGIN=function(){ var p=new firebase.auth.GoogleAuthProvider(); auth.signInWithPopup(p).catch(function(e){ alert('Đăng nhập lỗi: '+(e&&e.code||'')); }); };
+window.LOGOUT=function(){ auth.signOut(); };
+
+function onAuth(u){
+  renderAuth(u);
+  if(!u){ app.innerHTML='<div class="center"><div class="big">🔒</div>Vui lòng đăng nhập tài khoản admin để xem dữ liệu.</div>'; return; }
+  if(ADMINS.indexOf((u.email||'').toLowerCase())<0){
+    app.innerHTML='<div class="center"><div class="big">⛔</div>Tài khoản <b>'+esc(u.email)+'</b> không có quyền admin.</div>'; return;
+  }
+  loadDashboard();
+}
+
+function loadDashboard(){
+  app.innerHTML='<div class="center"><div class="big">📊</div>Đang tải dữ liệu…</div>';
+  Promise.all([
+    db.ref('chineseizi/stats').once('value'),
+    db.ref('chineseizi/users').once('value'),
+    db.ref('chineseizi/private').once('value'),
+    db.ref('chineseizi/guests').once('value')
+  ]).then(function(r){
+    render(r[0].val()||{}, r[1].val()||{}, r[2].val()||{}, r[3].val()||{});
+  }).catch(function(e){
+    app.innerHTML='<div class="center"><div class="big">⚠️</div>Không đọc được dữ liệu.<br><span class="muted">'+esc(e&&e.message||'')+'</span><br>Kiểm tra Rules Realtime Database.</div>';
+  });
+}
+
+function render(stats, users, priv, guests){
+  var uIds=Object.keys(users), gIds=Object.keys(guests);
+  var totalVisits=stats.totalVisits||0;
+  var totalXp=0; uIds.forEach(function(id){ totalXp+=(users[id].xp||0); });
+  gIds.forEach(function(id){ totalXp+=(guests[id].xp||0); });
+
+  // học viên
+  var rows=uIds.map(function(id){ var u=users[id]||{}, p=priv[id]||{};
+    return {name:u.name||p.name||'Học viên', email:p.email||'(ẩn)', photo:u.photo||'', xp:u.xp||0, streak:u.streak||0, days:daysStudied(u.days), updated:u.updated};
+  }).sort(function(a,b){return b.xp-a.xp;});
+
+  // khách
+  var grows=gIds.map(function(id){ var g=guests[id]||{};
+    return {id:id, xp:g.xp||0, streak:g.streak||0, days:daysStudied(g.days), visits:g.visits||0, lastSeen:g.lastSeen};
+  }).sort(function(a,b){return (b.lastSeen||0)-(a.lastSeen||0);});
+
+  // biểu đồ truy cập 14 ngày
+  var sd=stats.days||{}; var bars=lastDays(14).map(function(k){ return {lab:k.slice(5), v:sd[k]||0}; });
+  var maxv=Math.max(1,Math.max.apply(null,bars.map(function(x){return x.v;})));
+
+  app.innerHTML=
+  '<div class="stat-row">'+
+    statCard(totalVisits,'👀 Lượt truy cập')+
+    statCard(uIds.length,'🧑‍🎓 Học viên (đăng nhập)')+
+    statCard(gIds.length,'👤 Khách (chưa đăng nhập)')+
+    statCard(totalXp,'⭐ Tổng XP')+
+  '</div>'+
+  '<div class="card" style="margin-bottom:22px"><b>📈 Lượt truy cập 14 ngày gần đây</b>'+
+    '<div class="bars">'+bars.map(function(b){return '<div class="col"><div class="muted" style="font-size:11px;font-weight:800">'+(b.v||'')+'</div><div class="fill" style="height:'+Math.round(b.v/maxv*100)+'%"></div><div class="lab">'+b.lab+'</div></div>';}).join('')+'</div></div>'+
+  '<h2>🧑‍🎓 Học viên ('+rows.length+')</h2>'+
+  '<div class="tbl-wrap"><table><thead><tr><th>#</th><th>Tên</th><th>Email</th><th>XP</th><th>Streak</th><th>Ngày học</th><th>Hoạt động gần nhất</th></tr></thead><tbody>'+
+    (rows.length?rows.map(function(u,i){
+      return '<tr><td>'+(i+1)+'</td><td>'+(u.photo?'<img class="avatar" src="'+esc(u.photo)+'" referrerpolicy="no-referrer">':'')+esc(u.name)+'</td>'+
+        '<td>'+esc(u.email)+'</td><td><span class="pill">'+u.xp+'</span></td><td>🔥 '+u.streak+'</td><td>'+u.days+'</td><td class="muted">'+fdate(u.updated)+'</td></tr>';
+    }).join(''):'<tr><td colspan="7" class="muted" style="text-align:center;padding:24px">Chưa có học viên đăng nhập.</td></tr>')+
+  '</tbody></table></div>'+
+  '<h2>👤 Khách ('+grows.length+')</h2>'+
+  '<div class="tbl-wrap"><table><thead><tr><th>#</th><th>Mã khách</th><th>XP</th><th>Streak</th><th>Ngày học</th><th>Lượt vào</th><th>Lần cuối</th></tr></thead><tbody>'+
+    (grows.length?grows.map(function(g,i){
+      return '<tr><td>'+(i+1)+'</td><td class="muted">'+esc(g.id)+'</td><td><span class="pill">'+g.xp+'</span></td><td>🔥 '+g.streak+'</td><td>'+g.days+'</td><td>'+g.visits+'</td><td class="muted">'+fdate(g.lastSeen)+'</td></tr>';
+    }).join(''):'<tr><td colspan="7" class="muted" style="text-align:center;padding:24px">Chưa có khách.</td></tr>')+
+  '</tbody></table></div>'+
+  '<div style="margin-top:18px"><button class="btn btn-ghost" onclick="location.reload()">↻ Tải lại dữ liệu</button> <a class="btn btn-ghost" href="./">← Về trang chính</a></div>';
+}
+
+function statCard(n,l){ return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'; }
+function lastDays(n){ var out=[],d=new Date(); d.setDate(d.getDate()-n+1); for(var i=0;i<n;i++){ out.push(d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)); d.setDate(d.getDate()+1);} return out; }
+</script>
+</body>
+</html>
