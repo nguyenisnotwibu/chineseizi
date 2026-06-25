@@ -40,6 +40,28 @@ function computeStreak(days){
 var fb=null, auth=null, db=null, USER=null, cfgOk=false;
 var pushTimer=null;
 
+/* ID khách (chưa đăng nhập) lưu theo thiết bị */
+function guestId(){
+  var g=lsGet('cz_guest','');
+  if(!g){ g='g_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); lsSet('cz_guest',g); }
+  return g;
+}
+/* Đếm lượt truy cập (kể cả khách) + đánh dấu khách online */
+function trackVisit(){
+  if(!cfgOk) return;
+  try{
+    var inc=firebase.database.ServerValue.increment;
+    db.ref('chineseizi/stats/totalVisits').set(inc(1));
+    db.ref('chineseizi/stats/days/'+today()).set(inc(1));
+    if(!USER){
+      var gref=db.ref('chineseizi/guests/'+guestId());
+      gref.child('visits').set(inc(1));
+      gref.child('lastSeen').set(Date.now());
+      gref.child('firstSeen').once('value').then(function(s){ if(!s.exists()) gref.child('firstSeen').set(Date.now()); });
+    }
+  }catch(e){}
+}
+
 /* ---------- Ghi nhận hoạt động (gọi khi nhận XP) ---------- */
 function recordXp(total, delta){
   if(!delta) return;
@@ -60,6 +82,7 @@ function initFirebase(){
     auth.onAuthStateChanged(onAuthChange);
     // xử lý kết quả redirect (nếu popup bị chặn)
     auth.getRedirectResult().catch(function(){});
+    trackVisit();          // đếm lượt truy cập (kể cả khách)
   }catch(e){ cfgOk=false; }
   renderAuth();
 }
@@ -106,14 +129,20 @@ function mergeOnLogin(u){
   }).catch(function(){});
 }
 function schedulePush(){
-  if(!USER||!cfgOk) return;
+  if(!cfgOk) return;
   clearTimeout(pushTimer);
   pushTimer=setTimeout(function(){
     var days=lsGet('cz_days',{});
-    db.ref(DB_ROOT+'/'+USER.uid).update({
-      name:USER.displayName||'Học viên', photo:USER.photoURL||'',
-      xp:getXp(), streak:computeStreak(days), days:days, updated:Date.now()
-    }).catch(function(){});
+    var base={ xp:getXp(), streak:computeStreak(days), days:days, updated:Date.now() };
+    if(USER){
+      base.name=USER.displayName||'Học viên'; base.photo=USER.photoURL||'';
+      db.ref('chineseizi/users/'+USER.uid).update(base).catch(function(){});
+      // email lưu ở nhánh riêng, chỉ admin đọc được
+      db.ref('chineseizi/private/'+USER.uid).update({ email:USER.email||'', name:USER.displayName||'', updated:Date.now() }).catch(function(){});
+    } else {
+      var g=Object.assign({ guest:true, lastSeen:Date.now() }, base);
+      db.ref('chineseizi/guests/'+guestId()).update(g).catch(function(){});
+    }
   }, 1500);
 }
 
