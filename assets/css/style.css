@@ -2,25 +2,25 @@
    CHINESEIZI — Gen Z tím · style.css
    ========================================================= */
 :root{
-  --violet:#7c3aed;        /* tím chủ đạo */
-  --violet-700:#6d28d9;
-  --violet-300:#c4b5fd;
-  --magenta:#d946ef;       /* tím hồng */
-  --pink:#ec4899;
-  --cyan:#22d3ee;
+  --violet:#5a32a8;        /* tím đậm cho chữ nhấn (pinyin, link) */
+  --violet-700:#46237f;
+  --violet-300:#c9b8f0;
+  --magenta:#a32168;       /* hồng mận đậm cho Hán-Việt */
+  --pink:#d14f8a;
+  --cyan:#1f8a72;          /* teal đậm cho thẻ loại từ */
   --lime:#a3e635;
-  --amber:#fbbf24;
-  --ink:#1e1b2e;           /* chữ đậm */
-  --muted:#6b6780;         /* chữ phụ */
-  --line:#ece8f7;
-  --bg:#f6f3ff;            /* nền trang */
+  --amber:#c98a1e;
+  --ink:#231d36;           /* chữ chính đậm gần đen — đọc rõ trên nền pastel */
+  --muted:#5e5677;         /* chữ phụ */
+  --line:#e8def8;
+  --bg:#fdf8ff;            /* nền pastel */
   --card:#ffffff;
-  --grad:linear-gradient(135deg,#7c3aed 0%,#a21caf 55%,#ec4899 100%);
-  --grad-soft:linear-gradient(135deg,#ede9fe,#fae8ff);
-  --shadow:0 10px 30px -12px rgba(124,58,237,.30);
-  --shadow-lg:0 24px 60px -20px rgba(124,58,237,.45);
+  --grad:linear-gradient(135deg,#7c5cce 0%,#b257bf 55%,#d4569a 100%);  /* pastel vừa-đậm, chữ trắng đọc rõ */
+  --grad-soft:linear-gradient(135deg,#ece4fb,#fbdcec);
+  --shadow:0 12px 32px -14px rgba(150,120,210,.32);
+  --shadow-lg:0 24px 58px -20px rgba(150,120,210,.42);
   --radius:20px;
-  --hsk1:#22c55e; --hsk2:#3b82f6; --hsk3:#f59e0b; --hsk4:#ef4444;
+  --hsk1:#16a34a; --hsk2:#2563eb; --hsk3:#c98a1e; --hsk4:#dc2626;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -64,12 +64,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .section-title .more{margin-left:auto;font-size:14px;font-weight:700;color:var(--violet)}
 
 /* ---------- Hero search ---------- */
-.hero{background:var(--grad);border-radius:28px;padding:40px 28px 30px;color:#fff;
+.hero{background:linear-gradient(135deg,#dccaf7 0%,#f7cbe6 48%,#c6ead9 100%);border-radius:28px;padding:40px 28px 30px;color:#2c2056;
   box-shadow:var(--shadow-lg);position:relative;overflow:hidden;margin-bottom:26px}
 .hero::after{content:"汉字";position:absolute;right:24px;bottom:-26px;font-size:150px;
-  font-weight:900;opacity:.10;font-family:'Noto Sans SC',sans-serif;pointer-events:none}
-.hero h1{margin:0 0 4px;font-size:30px;font-weight:900;letter-spacing:-.5px}
-.hero p{margin:0 0 20px;opacity:.92;font-weight:600}
+  font-weight:900;opacity:.22;color:#fff;font-family:'Noto Sans SC',sans-serif;pointer-events:none}
+.hero h1{margin:0 0 4px;font-size:30px;font-weight:900;letter-spacing:-.5px;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.hero p{margin:0 0 20px;opacity:1;font-weight:800;color:#43326f}
 .searchbox{display:flex;align-items:center;gap:10px;background:#fff;border-radius:16px;
   padding:8px 10px 8px 18px;box-shadow:0 14px 30px -12px rgba(0,0,0,.35);max-width:760px}
 .searchbox input{flex:1;border:none;outline:none;font-size:18px;color:var(--ink);
@@ -79,10 +79,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   transition:.18s;white-space:nowrap}
 .btn-search:hover{transform:translateY(-1px);filter:brightness(1.05)}
 .tabs{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
-.tab{padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;
-  font-weight:700;font-size:14px;transition:.18s;border:1px solid rgba(255,255,255,.25)}
+.tab{padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.72);color:#43326f;
+  font-weight:800;font-size:14px;transition:.18s;border:1px solid rgba(255,255,255,.7)}
 .tab.active{background:#fff;color:var(--violet-700)}
-.tab:hover{background:rgba(255,255,255,.32)}
+.tab:hover{background:rgba(255,255,255,.92)}
 
 /* live suggestions */
 .suggest{position:relative;max-width:760px}
@@ -219,12 +219,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .hub-card .hi{font-size:40px;position:absolute;top:18px;right:20px;opacity:.85}
 .hub-card h3{margin:0;font-size:22px;font-weight:900}
 .hub-card p{margin:4px 0 0;opacity:.92;font-size:14px;font-weight:600}
-.hc-flash{background:linear-gradient(135deg,#7c3aed,#a855f7)}
-.hc-quiz{background:linear-gradient(135deg,#db2777,#f472b6)}
-.hc-browse{background:linear-gradient(135deg,#0891b2,#22d3ee)}
-.hc-test{background:linear-gradient(135deg,#ea580c,#fbbf24)}
-.hc-note{background:linear-gradient(135deg,#4f46e5,#818cf8)}
-.hc-translate{background:linear-gradient(135deg,#059669,#34d399)}
+.hc-flash{background:linear-gradient(135deg,#7e5fd0,#a87fe0)}
+.hc-quiz{background:linear-gradient(135deg,#cf4f86,#e87faa)}
+.hc-browse{background:linear-gradient(135deg,#2f90b8,#5fbdd6)}
+.hc-test{background:linear-gradient(135deg,#d57f3a,#eaa94e)}
+.hc-note{background:linear-gradient(135deg,#6055c8,#8e86e0)}
+.hc-translate{background:linear-gradient(135deg,#1f9276,#56c096)}
 
 /* level selector */
 .seg{display:inline-flex;background:#f3eaff;border-radius:13px;padding:5px;gap:4px;flex-wrap:wrap}
