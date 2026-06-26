@@ -324,7 +324,7 @@ function makeQuestions(pool,count){
   var picked=shuffle(pool).slice(0,Math.min(count,pool.length));
   return picked.map(function(w){
     var type=['h2m','m2h','h2p'][rand(3)], q={word:w,type:type};
-    if(type==='h2m'){ q.prompt='<div class="q-prompt">Chọn NGHĨA đúng</div><div class="q-han zh">'+esc(w.s)+'</div><div class="q-py">'+esc(w.p)+'</div>'; q.answer=w.m; q.options=distract(pool,w,'m'); }
+    if(type==='h2m'){ q.prompt='<div class="q-prompt">Chọn NGHĨA đúng</div><div class="q-han zh">'+esc(w.s)+'</div><div class="q-py">'+esc(w.p)+'</div><div style="margin-top:8px"><button class="tool" style="display:inline-flex" onclick="CZ.say(\''+esc(w.s)+'\',this)">🔊 Nghe</button></div>'; q.answer=w.m; q.options=distract(pool,w,'m'); }
     else if(type==='m2h'){ q.prompt='<div class="q-prompt">Chọn CHỮ HÁN đúng</div><div style="font-size:26px;font-weight:800;margin:10px 0">“'+esc(w.m)+'”</div>'; q.answer=w.s; q.options=distract(pool,w,'s'); q.zh=true; }
     else { q.prompt='<div class="q-prompt">Chọn PINYIN đúng</div><div class="q-han zh">'+esc(w.s)+'</div>'; q.answer=w.p; q.options=distract(pool,w,'p'); }
     return q;
@@ -345,7 +345,15 @@ function renderQuiz(){
   if(qz.i>=qz.qs.length){ return quizDone(); }
   var q=qz.qs[qz.i], pct=Math.round(qz.i/qz.qs.length*100);
   var optHtml=q.options.map(function(o){
-    return '<button class="opt '+(q.zh?'zh':'')+'" onclick="CZ.qPick(this,\''+esc(o).replace(/'/g,"\\'")+'\')">'+esc(o)+'</button>';
+    var inner;
+    if(q.zh){
+      var py=(getEntry(o)||{}).p||'';
+      inner='<span style="display:flex;align-items:center;gap:10px;width:100%">'+
+        '<span class="zh" style="font-size:22px;font-weight:800">'+esc(o)+'</span>'+
+        (py?'<span style="color:var(--violet);font-weight:800;font-size:14px">'+esc(py)+'</span>':'')+
+        '<span style="margin-left:auto;font-size:18px;cursor:pointer;padding:2px 6px;border-radius:8px;background:#f3eaff" title="Nghe phát âm" onclick="event.stopPropagation();CZ.say(\''+esc(o)+'\',this)">🔊</span></span>';
+    } else { inner=esc(o); }
+    return '<button class="opt" data-val="'+esc(o)+'" onclick="CZ.qPick(this,\''+esc(o).replace(/'/g,"\\'")+'\')">'+inner+'</button>';
   }).join('');
   app().innerHTML=
   '<div class="view"><div class="quiz-wrap">'+
@@ -368,7 +376,7 @@ CZ.qPick=function(btn,val){
   var q=qz.qs[qz.i], correct=q.answer;
   document.querySelectorAll('.opt').forEach(function(b){
     b.classList.add('disabled');
-    if(b.textContent===correct) b.classList.add('correct');
+    if(b.getAttribute('data-val')===correct) b.classList.add('correct');
   });
   var ok=(val===correct);
   if(ok){ btn.classList.add('correct'); qz.score++; addXp(10); }
