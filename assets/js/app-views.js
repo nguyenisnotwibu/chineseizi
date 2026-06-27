@@ -154,6 +154,7 @@ function viewLearn(){
       hub('hc-test','📝','Thi thử HSK','Đề chấm điểm có hẹn giờ','test')+
       hub('hc-note','★','Sổ tay của tôi','Ôn lại từ đã lưu','notebook')+
       hub('hc-translate','🌐','Dịch nhanh','Trung ↔ Việt, tách từ','translate')+
+      hub('hc-grammar','📖','Ngữ pháp','Cấu trúc HSK 1→6','grammar')+
     '</div>'+
     '<div class="card pad-lg" style="margin-top:22px">'+
       '<div class="section-title" style="font-size:17px">📈 Học theo cấp độ</div>'+
