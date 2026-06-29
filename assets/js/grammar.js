@@ -99,6 +99,7 @@ function viewGrammar(arg){
     return '<button class="'+(gSel===l[0]?'active':'')+'" onclick="CZ.go(\'grammar/'+l[0]+'\')">'+l[1]+'</button>';
   }).join('');
   var cards=list.map(function(g){
+    var idx=G.indexOf(g);
     var exHtml=(g.ex||[]).map(function(e){
       return '<div class="gram-ex">'+
         '<span class="gram-speak" title="Nghe" onclick="CZ.say(\''+esc(e.s)+'\',this)">🔊</span>'+
@@ -106,10 +107,14 @@ function viewGrammar(arg){
         '<div class="gram-p">'+esc(e.p)+'</div><div class="gram-v">'+esc(e.v)+'</div></div>';
     }).join('');
     return '<div class="card gram-card">'+
-      '<div class="gram-head">'+hskBadge(g.hsk)+'<span class="gram-title">'+esc(g.title)+'</span></div>'+
+      '<div class="gram-head" style="cursor:pointer" onclick="CZ.go(\'gpractice/'+idx+'\')">'+
+        hskBadge(g.hsk)+'<span class="gram-title">'+esc(g.title)+'</span>'+
+        '<span style="margin-left:auto;font-size:12px;color:var(--violet);font-weight:700;background:#f3eaff;padding:3px 10px;border-radius:8px">Luyện tập →</span>'+
+      '</div>'+
       '<div class="gram-struct zh">'+esc(g.struct)+'</div>'+
       '<div class="gram-explain">'+esc(g.explain)+'</div>'+
       exHtml+
+      '<div style="margin-top:12px"><button class="btn btn-primary" onclick="CZ.go(\'gpractice/'+idx+'\')">🎯 Luyện tập điểm này</button></div>'+
     '</div>';
   }).join('');
   app().innerHTML=
