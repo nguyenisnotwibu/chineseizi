@@ -22,6 +22,35 @@ function shuffle(arr){
   return a;
 }
 
+/* ── Text-to-speech (Web Speech API) ─────────────── */
+var _speakItems = [];
+function speak(text){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'zh-CN';
+  utt.rate = 0.85;
+  utt.pitch = 1;
+  window.speechSynthesis.speak(utt);
+}
+function speakBtn(text){
+  var idx = _speakItems.length;
+  _speakItems.push(text);
+  return '<button class="gp-speak-btn" onclick="CZ._gpSpeak('+idx+')" title="Nghe phát âm">🔊</button>';
+}
+/* Process explain text: add 🔊 button after lines containing Chinese */
+function explainWithAudio(explainStr){
+  var lines = explainStr.split('\n');
+  return lines.map(function(line){
+    var zhParts = line.match(/[一-鿿！-～，。！？、：；「」【】『』]{2,}/g);
+    if(!zhParts || !zhParts.length) return esc(line);
+    var fullZh = zhParts.join('');
+    var idx = _speakItems.length;
+    _speakItems.push(fullZh);
+    return esc(line)+'<button class="gp-speak-btn" onclick="CZ._gpSpeak('+idx+')" title="Nghe phát âm">🔊</button>';
+  }).join('\n');
+}
+
 /* Extract main Chinese grammar keyword from struct string */
 function mainKey(g){
   var m = g.struct.match(/[一-鿿……]+/g);
@@ -241,6 +270,7 @@ function viewGpractice(arg){
   if(!g){ CZ.go('grammar'); return; }
 
   var questions = buildQuestions(g, idx);
+  _speakItems = [];
   PS = { g:g, idx:idx, questions:questions, current:0, score:0, answered:false };
 
   renderQuestion();
@@ -296,7 +326,7 @@ function renderQuestion(){
   } else if(q.type === 'truefalse'){
     body =
       '<div class="gp-question">Câu sau đúng hay sai về mặt ngữ pháp?</div>'+
-      '<div class="gp-sentence-box zh">'+esc(q.q)+'</div>'+
+      '<div class="gp-sentence-box zh">'+esc(q.q)+' '+speakBtn(q.q)+'</div>'+
       '<div class="gp-tf-row">'+
         '<button class="gp-tf-btn" onclick="CZ._gpAnswer(\'✅ Đúng\')">✅ Đúng</button>'+
         '<button class="gp-tf-btn" onclick="CZ._gpAnswer(\'❌ Sai\')">❌ Sai</button>'+
@@ -413,16 +443,17 @@ function showFeedback(ok, q, chosen){
       (ok ? '✅ Chính xác! Xuất sắc!' : '❌ Chưa đúng rồi!')+
     '</div>';
 
+  var correctDisplay = q.type === 'order' ? q.correctStr : q.answer;
   var answerDetail = (!ok || q.type==='order' || q.type==='translate') ?
     '<div class="gp-answer-box">'+
       '<div class="gp-answer-label">Đáp án đúng:</div>'+
-      '<div class="zh gp-answer-text">'+esc(q.answer)+'</div>'+
+      '<div class="zh gp-answer-text">'+esc(correctDisplay)+' '+speakBtn(correctDisplay)+'</div>'+
     '</div>' : '';
 
   var explainHtml =
     '<div class="gp-explain">'+
       '<div class="gp-explain-title">💡 Giải thích chi tiết</div>'+
-      '<div class="gp-explain-body" style="white-space:pre-line">'+esc(q.explain)+'</div>'+
+      '<div class="gp-explain-body" style="white-space:pre-line">'+explainWithAudio(q.explain)+'</div>'+
     '</div>';
 
   var card = document.querySelector('.gp-card');
@@ -566,7 +597,11 @@ var css =
 '.gp-result-msg{font-size:16px;font-weight:700;margin-bottom:14px;line-height:1.5}'+
 '.gp-result-xp{background:#fef9c3;color:#854d0e;font-weight:800;border-radius:12px;padding:8px 20px;display:inline-block;margin-bottom:20px;font-size:16px}'+
 '.gp-result-actions{display:flex;flex-direction:column;gap:10px;margin-top:16px}'+
-'.gp-back-btn2{background:#f3eaff;color:var(--violet);font-weight:700}';
+'.gp-back-btn2{background:#f3eaff;color:var(--violet);font-weight:700}'+
+
+/* Speak button */
+'.gp-speak-btn{background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;vertical-align:middle;opacity:.75;transition:opacity .15s,transform .15s;line-height:1}'+
+'.gp-speak-btn:hover{opacity:1;transform:scale(1.2)}';
 
 var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
@@ -576,5 +611,6 @@ CZ._gpAnswer    = gpAnswer;
 CZ._gpTile      = gpTile;
 CZ._gpCheckOrder= gpCheckOrder;
 CZ._gpNext      = gpNext;
+CZ._gpSpeak     = function(i){ speak(_speakItems[i]); };
 
 })();
