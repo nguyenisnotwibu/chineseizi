@@ -200,8 +200,15 @@ function mkChooseCorrect(g, idx){
     }
     return wex;
   });
-  wrongs = wrongs.filter(function(w){ return w !== correct; });
-  while(wrongs.length < 3) wrongs.push(wrongs[0]||'我是很好了。');
+  /* Loai bo trung lap va loai bo correct */
+  var seen = {};
+  wrongs = wrongs.filter(function(w){
+    if(w === correct || seen[w]) return false;
+    seen[w] = true; return true;
+  });
+  var fallbacks = ['我是很好了。','他在是家。','我们比都好。'];
+  var fi = 0;
+  while(wrongs.length < 3){ wrongs.push(fallbacks[fi++]||'他不好是。'); }
 
   return {
     type:'choose',
@@ -291,9 +298,8 @@ function renderQuestion(){
       '<div class="gp-question">Câu sau đúng hay sai về mặt ngữ pháp?</div>'+
       '<div class="gp-sentence-box zh">'+esc(q.q)+'</div>'+
       '<div class="gp-tf-row">'+
-        ['✅ Đúng','❌ Sai'].map(function(opt){
-          return '<button class="gp-tf-btn" onclick="CZ._gpAnswer('+JSON.stringify(opt)+')">'+opt+'</button>';
-        }).join('')+
+        '<button class="gp-tf-btn" onclick="CZ._gpAnswer(\'✅ Đúng\')">✅ Đúng</button>'+
+        '<button class="gp-tf-btn" onclick="CZ._gpAnswer(\'❌ Sai\')">❌ Sai</button>'+
       '</div>';
 
   } else {
@@ -318,9 +324,11 @@ function renderQuestion(){
 }
 
 function renderMCQ(options){
+  /* Luu options vao bien global de tranh loi escape HTML voi JSON.stringify */
+  window._GP_OPTS = options;
   return '<div class="gp-opts">'+
     options.map(function(opt, i){
-      return '<button class="gp-opt" onclick="CZ._gpAnswer('+JSON.stringify(opt)+')">'+
+      return '<button class="gp-opt" onclick="CZ._gpAnswer(window._GP_OPTS['+i+'])">'+
         '<span class="gp-opt-key">'+'ABCD'[i]+'</span>'+
         '<span class="gp-opt-txt zh">'+esc(opt)+'</span></button>';
     }).join('')+
