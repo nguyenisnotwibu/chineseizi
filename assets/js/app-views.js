@@ -44,7 +44,7 @@ function viewWord(s){
 
   var defs='<div class="def-block">';
   if(isVi){
-    defs+='<div class="def-item"><span class="def-num">1</span><span class="def-mean">'+esc(w.m)+'</span>'+
+    defs+='<div class="def-item"><span class="def-num">1</span><span class="def-mean">'+esc(w.mv||w.m)+'</span>'+
       (w.pos?'<span class="pos-tag">'+esc(w.pos)+'</span>':'');
     if(w.ex&&w.ex.length){
       defs+=w.ex.map(function(e){
@@ -286,7 +286,7 @@ function renderFlash(){
       '<div class="flash-face flash-back">'+
         '<div class="py">'+esc(w.p)+'</div>'+
         '<div class="hv">⎈ '+esc(w.hv)+'</div>'+
-        '<div class="mn">'+esc(w.m)+'</div>'+exHtml+
+        '<div class="mn">'+esc(w.mv||w.m)+'</div>'+exHtml+
         '<div id="fcImg"></div>'+
       '</div>'+
     '</div></div>'+
@@ -322,12 +322,14 @@ function distract(pool,w,field){
 }
 function makeQuestions(pool,count){
   pool=pool.filter(function(w){return w.s&&w.m&&w.p;});
+  // Normalise: _vi = Vietnamese meaning (mv for HSK4-6, m for HSK1-3 which already uses Vietnamese)
+  pool=pool.map(function(w){ w._vi=w.mv||w.m; return w; });
   var picked=shuffle(pool).slice(0,Math.min(count,pool.length));
   return picked.map(function(w){
     var type=['h2m','m2h','h2p'][rand(3)], q={word:w,type:type};
-    if(type==='h2m'){ q.prompt='<div class="q-prompt">Chọn NGHĨA đúng</div><div class="q-han zh">'+esc(w.s)+'</div><div class="q-py">'+esc(w.p)+'</div><div style="margin-top:8px"><button class="tool" style="display:inline-flex" onclick="CZ.say(\''+esc(w.s)+'\',this)">🔊 Nghe</button></div>'; q.answer=w.m; q.options=distract(pool,w,'m'); }
-    else if(type==='m2h'){ q.prompt='<div class="q-prompt">Chọn CHỮ HÁN đúng</div><div style="font-size:26px;font-weight:800;margin:10px 0">“'+esc(w.m)+'”</div>'; q.answer=w.s; q.options=distract(pool,w,'s'); q.zh=true; }
-    else { q.prompt='<div class="q-prompt">Chọn PINYIN đúng</div><div class="q-han zh">'+esc(w.s)+'</div>'; q.answer=w.p; q.options=distract(pool,w,'p'); }
+    if(type==='h2m'){ q.prompt='<div class=”q-prompt”>Chọn NGHĨA đúng</div><div class=”q-han zh”>'+esc(w.s)+'</div><div class=”q-py”>'+esc(w.p)+'</div><div style=”margin-top:8px”><button class=”tool” style=”display:inline-flex” onclick=”CZ.say(\''+esc(w.s)+'\',this)”>🔊 Nghe</button></div>'; q.answer=w._vi; q.options=distract(pool,w,'_vi'); }
+    else if(type==='m2h'){ q.prompt='<div class=”q-prompt”>Chọn CHỮ HÁN đúng</div><div style=”font-size:26px;font-weight:800;margin:10px 0”>”'+esc(w._vi)+'”</div>'; q.answer=w.s; q.options=distract(pool,w,'s'); q.zh=true; }
+    else { q.prompt='<div class=”q-prompt”>Chọn PINYIN đúng</div><div class=”q-han zh”>'+esc(w.s)+'</div>'; q.answer=w.p; q.options=distract(pool,w,'p'); }
     return q;
   });
 }
@@ -476,7 +478,7 @@ function segment(text){
   }
   return out;
 }
-function glossOf(w){ return w.m || (w.en?w.en[0]:''); }
+function glossOf(w){ return w.mv||w.m || (w.en?w.en[0]:''); }
 var trDir='zh2vi';
 function viewTranslate(){
   app().innerHTML=

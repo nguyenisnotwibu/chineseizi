@@ -135,7 +135,7 @@ function search(q){
   } else {
     var nq=deburr(q).replace(/\s+/g,''), dq=deburr(q);
     WORDS.forEach(function(w){
-      var py=deburr(w.p).replace(/\s+/g,''), hv=deburr(w.hv).replace(/\s+/g,''), mn=deburr(w.m);
+      var py=deburr(w.p).replace(/\s+/g,''), hv=deburr(w.hv).replace(/\s+/g,''), mn=deburr(w.mv||w.m);
       if(py===nq||hv===nq) push(w.s,0);
       else if(py.indexOf(nq)===0||hv.indexOf(nq)===0) push(w.s,1);
       else if(py.indexOf(nq)>=0||hv.indexOf(nq)>=0) push(w.s,2);
@@ -160,7 +160,7 @@ function hskBadge(n){ return '<span class="hsk-badge hsk-'+n+'">HSK '+n+'</span>
 
 function wItem(w){
   var saved=isSaved(w.s);
-  var mean=w.m || (w.en?w.en.join('; '):'');
+  var mean=w.mv||w.m || (w.en?w.en.join('; '):'');
   var badge=w.hsk?hskBadge(w.hsk):'<span class="hsk-badge" style="background:#94a3b8">A·V</span>';
   var hv=w.hv?' · <span class="hv">'+esc(w.hv)+'</span>':'';
   return '<div class="witem" onclick="CZ.go(\'word/'+encodeURIComponent(w.s)+'\')">'+
@@ -297,7 +297,7 @@ function liveSuggest(v){
   box.innerHTML='<div class="suggest-list">'+res.map(function(w){
     return '<div class="suggest-item" onclick="CZ.go(\'word/'+encodeURIComponent(w.s)+'\')">'+
       '<span class="s zh">'+esc(w.s)+'</span><span class="p">'+esc(w.p)+'</span>'+
-      '<span class="m">'+esc(w.m)+'</span></div>';
+      '<span class="m">'+esc(w.mv||w.m)+'</span></div>';
   }).join('')+'</div>';
 }
 function doSearch(){ var q=$('#q'); if(q&&q.value.trim()) go('search/'+encodeURIComponent(q.value.trim())); }
