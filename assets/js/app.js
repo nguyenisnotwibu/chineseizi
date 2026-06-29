@@ -6,6 +6,8 @@
 
 /* ---------------- Dữ liệu ---------------- */
 var WORDS = window.CZ_WORDS || [];
+// Áp dụng nghĩa tiếng Việt cho HSK4-6 từ file riêng
+if(window.CZ_WORDS_VI){WORDS.forEach(function(w){if(CZ_WORDS_VI[w.s])w.mv=CZ_WORDS_VI[w.s];});}
 var TOPICS = window.CZ_TOPICS || [];
 var HOT = window.CZ_HOT || [];
 var TIPS = window.CZ_TIPS || [];
