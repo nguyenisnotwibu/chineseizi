@@ -485,7 +485,7 @@ function viewTranslate(){
   '<div class="tr-grid">'+
     '<div class="tr-pane">'+
       '<div class="tr-head"><span id="srcLab">'+(trDir==='zh2vi'?'Tiếng Trung':'Tiếng Việt')+'</span>'+
-        '<button class="tool" onclick="CZ.trSpeak()">🔊 Đọc</button></div>'+
+        '<span style="display:flex;gap:6px">'+(trDir==='zh2vi'?'<button class="tool" onclick="CZ.hwOpen(\'trIn\')">✍️ Viết tay</button>':'')+'<button class="tool" onclick="CZ.trSpeak()">🔊 Đọc</button></span></div>'+
       '<textarea id="trIn" placeholder="'+(trDir==='zh2vi'?'Nhập tiếng Trung, vd: 我喜欢学习汉语':'Nhập tiếng Việt, vd: tôi thích học')+'"></textarea>'+
       '<button class="btn btn-primary" onclick="CZ.trRun()" style="margin-top:6px">Dịch →</button>'+
     '</div>'+

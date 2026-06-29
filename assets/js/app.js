@@ -236,6 +236,7 @@ function viewHome(){
         '<div class="searchbox">'+
           '<span class="ico">🔍</span>'+
           '<input id="q" autocomplete="off" placeholder="Nhập chữ Hán, pinyin, Hán–Việt hoặc nghĩa tiếng Việt…">'+
+          '<button class="tool" style="background:#f3eaff" title="Nhập chữ viết tay" onclick="CZ.hwOpen(\'q\')">✍️</button>'+
           '<button class="btn-search" onclick="CZ.doSearch()">Tra cứu</button>'+
         '</div>'+
         '<div id="sg"></div>'+
@@ -309,6 +310,7 @@ function viewSearch(q){
     '<div class="section-title">🔍 Kết quả cho “'+esc(q)+'” <span style="color:var(--muted);font-weight:700;font-size:15px">('+res.length+' từ)</span></div>'+
     '<div class="searchbox" style="max-width:640px;margin-bottom:18px;box-shadow:var(--shadow)">'+
       '<span class="ico">🔍</span><input id="q2" value="'+esc(q)+'" placeholder="Tra từ khác…">'+
+      '<button class="tool" style="background:#f3eaff" title="Nhập chữ viết tay" onclick="CZ.hwOpen(\'q2\')">✍️</button>'+
       '<button class="btn-search" onclick="CZ.doSearch2()">Tra</button></div>';
   if(res.length){ html+='<div class="wlist">'+res.map(wItem).join('')+'</div>'; }
   else { html+='<div class="empty"><div class="big">🐼</div>Không tìm thấy từ nào.<br>Thử nhập chữ Hán, pinyin (vd: <b>nihao</b>), Hán–Việt (vd: <b>hoc sinh</b>) hoặc nghĩa tiếng Việt.</div>'; }
