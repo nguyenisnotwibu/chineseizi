@@ -321,9 +321,20 @@ function distract(pool,w,field){
   return shuffle(opts);
 }
 function makeQuestions(pool,count){
-  pool=pool.filter(function(w){return w.s&&w.m&&w.p;});
-  // Normalise: _vi = Vietnamese meaning (mv for HSK4-6, m for HSK1-3 which already uses Vietnamese)
-  pool=pool.map(function(w){ w._vi=w.mv||w.m; return w; });
+  // Chỉ giữ từ có NGHĨA TIẾNG VIỆT thật (HSK1-3: w.m đã là tiếng Việt; HSK4-6: cần w.mv),
+  // và loại các mục tham chiếu CEDICT (variant of / see / abbr. for…) vốn nghĩa kém, dễ ra tiếng Anh.
+  var JUNK=/^(variant of|see |old variant|abbr\.? for|also written|used in|surname |CL:|\()/i;
+  pool=pool.filter(function(w){
+    if(!(w.s&&w.p)) return false;
+    if(w.hsk&&w.hsk<=3) return !!w.m;
+    if(!w.mv) return false;
+    if(JUNK.test(w.m||'')) return false;
+    if(!/[^\x00-\x7F]/.test(w.mv)) return false;
+    return true;
+  });
+  // _vi = nghĩa tiếng Việt dùng cho câu hỏi/đáp án
+  pool=pool.map(function(w){ w._vi=((w.hsk&&w.hsk<=3)?w.m:(w.mv||w.m)); return w; });
+  if(pool.length<4) return [];
   var picked=shuffle(pool).slice(0,Math.min(count,pool.length));
   return picked.map(function(w){
     var type=['h2m','m2h','h2p'][rand(3)], q={word:w,type:type};
@@ -533,17 +544,4 @@ CZ.trRun=function(){
 
 /* đăng ký phần 2 */
 CZ._setViews({ flashcard:viewFlashcard, quiz:viewQuiz, test:viewTest, notebook:viewNotebook, translate:viewTranslate });
-
-/* phím tắt flashcard */
-document.addEventListener('keydown',function(e){
-  if(location.hash.indexOf('#flashcard/')!==0) return;
-  if(e.code==='Space'){ e.preventDefault(); CZ.fcFlip&&CZ.fcFlip(); }
-  else if(e.key==='ArrowRight'){ CZ.fcKnow&&CZ.fcKnow(); }
-  else if(e.key==='ArrowLeft'){ CZ.fcAgain&&CZ.fcAgain(); }
-});
-
-/* render lại đúng route sau khi đã đăng ký đủ view */
-CZ._render();
-window.CZ_VIEWS_PART2=true;
 })();
-
