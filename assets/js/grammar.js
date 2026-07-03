@@ -141,6 +141,10 @@ var css=
 '.gram-p{color:var(--violet);font-weight:700;font-size:14px}'+
 '.gram-v{color:var(--muted)}'+
 '.hc-grammar{background:linear-gradient(135deg,#5f8fd0,#8e7fd6)}'+
+'.g-ans{min-height:52px;border:2px dashed #c9b8f0;border-radius:14px;padding:10px;margin:8px 0;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}'+
+'.g-pieces{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}'+
+'.g-piece{font-size:22px;font-weight:800;padding:8px 13px;border-radius:12px;border:1px solid #e8def8;background:#faf7ff;cursor:pointer;color:var(--ink,#231d36);transition:.14s}'+
+'.g-piece:hover{background:var(--grad-soft,#ece4fb);transform:translateY(-2px)}'+
 '@media(max-width:760px){.gram-grid{grid-template-columns:1fr}}';
 var st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
 
